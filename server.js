@@ -26,7 +26,7 @@ startMenu = () => {
             choices: [
                 "View All Departments",
                 "View All Roles",
-                "View All Employees",
+                "View Employees",
                 "Add a Department",
                 "Add a Role",
                 "Add an Employee",
@@ -43,7 +43,7 @@ startMenu = () => {
             case "View All Roles":
                 viewRoles();
                 break;
-            case "View All Employees":
+            case "View Employees":
                 viewEmployees();
                 break;
             case "Add a Department":
@@ -79,11 +79,39 @@ const viewRoles = () => {
 };
 
 const viewEmployees = () => {
-    db.query(`SELECT * FROM employee`, (err, res) => {
-        if (err) throw err;
-        console.table(res);
-        startMenu();
-    })
+    inquirer.prompt([
+        {
+            type: "list",
+            message: "How would you like to view employees?",
+            choices: ["All Employees", "By Manager", "By Department"],
+            name: "viewOption"
+        },
+    ])
+    .then((answer) => {
+        switch (answer.viewOption) {
+            case "All Employees":
+                db.query(`SELECT * FROM employee`, (err, res) => {
+                    if (err) throw err;
+                    console.table(res);
+                    startMenu();
+                });
+                break;
+            case "By Manager":
+                db.query(`SELECT * FROM employee ORDER BY manager_id`, (err, res) => {
+                    if (err) throw err;
+                    console.table(res);
+                    startMenu();
+                });
+                break;
+            case "By Department":
+                db.query(`SELECT * FROM employee JOIN role ON employee.role_id = role. id JOIN department ON role.department_id = department.id ORDER BY department.id`, (err, res) => {
+                    if (err) throw err;
+                    console.table(res);
+                    startMenu();
+                });
+                break;   
+        }
+    });
 };
 
 const addDepartment = () => {
