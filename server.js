@@ -79,7 +79,7 @@ const viewRoles = () => {
 };
 
 const viewEmployees = () => {
-    db.query(`SELECT * FROm employee`, (err, res) => {
+    db.query(`SELECT * FROM employee`, (err, res) => {
         if (err) throw err;
         console.table(res);
         startMenu();
@@ -101,4 +101,50 @@ const addDepartment = () => {
             startMenu();
         });
     });
+};
+
+const addRole = () => {
+    
+    db.query(`SELECT id, name FROM department`, (err, departments) => {
+        if (err) throw err;
+
+        const departmentOptions = departments.map((department) => ({
+            name: department.name,
+            value: department.id,
+        }));
+
+        inquirer.prompt([
+            {
+                type: "input",
+                message: "What is the name of the role you are adding?",
+                name: "roleTitle"
+            },
+            {
+                type: "input",
+                message: "Please enter the base salary for this role using only numbers:",
+                name: "salary",
+                validate: (input) => {
+                    const validateInput = input.replace(/[^0-9.]/g, '');
+                    const numbers = /^\d+(\.\d+)?$/.test(validateInput);
+                    if (numbers) {
+                        return true;
+                    }
+                    return `Please enter a salary using only numbers.`;
+                },
+            },
+            {
+                type: "list",
+                message: "What is the department this role goes under?",
+                choices: departmentOptions,
+                name: "departmentId"
+            }
+        ])
+        .then(answer => {
+            db.query(`INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`, [answer.roleTitle, answer.salary, answer.departmentId], (err, res) => {
+                if (err) throw err;
+                console.log("Job added!");
+                startMenu();
+            });
+        });      
+    })
 };
