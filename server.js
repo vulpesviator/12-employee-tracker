@@ -30,7 +30,7 @@ startMenu = () => {
                 "Add a Department",
                 "Add a Role",
                 "Add an Employee",
-                "Update an Employee Role"
+                "Update an Employee's Manager or Role"
             ],
             name: "menu"
         },
@@ -55,7 +55,7 @@ startMenu = () => {
             case "Add an Employee":
                 addEmployee();
                 break;
-            case "Update an Employee Role":
+            case "Update an Employee's Manager or Role":
                 editEmployeeRole();
                 break;
         }
@@ -238,6 +238,19 @@ const editEmployeeRole = () => {
             value: role.id,
         }));
 
+    db.query(
+      `SELECT id, first_name, last_name FROM employee`,
+      (err, managers) => {
+        if (err) throw err;
+
+        const managerOptions = [
+          { name: "None", value: null },
+          ...managers.map((employee) => ({
+            name: employee.first_name + " " + employee.last_name,
+            value: employee.id,
+          })),
+        ];
+
         
   
           inquirer
@@ -249,10 +262,19 @@ const editEmployeeRole = () => {
                 name: "employeeId",
               },
               {
+                type: 'confirm',
+                message: 'Do they have a new job title or role?',
+                name: 'checkRole',
+                default: true
+                },
+              {
                 type: "list",
                 message: "What is the employee\'s new job title?",
                 choices: roleOptions,
                 name: "roleId",
+                when(answers) {
+                    return answers.checkRole === true
+                },
               },
               {
                 type: 'confirm',
@@ -263,7 +285,7 @@ const editEmployeeRole = () => {
                 {
                     type: "list",
                     message: "Who is the employee's manager?",
-                    choices: allEmployees,
+                    choices: managerOptions,
                     name: "managerId",
                     when(answers) {
                         return answers.checkManager === true
@@ -288,5 +310,6 @@ const editEmployeeRole = () => {
             });
         }
       );
+    });
     });
   };
