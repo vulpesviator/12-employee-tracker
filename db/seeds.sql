@@ -1,18 +1,20 @@
 use hr_db;
 
-INSERT INTO department (name)
+INSERT INTO department 
+    (name)
 VALUES 
     ("Management"),
     ("Operations"),
     ("Customer Success"),
     ("DevOps"),
     ("QA"),
-    ("Finance")
+    ("Finance");
 
-INSERT INTO role (title, salary, department_id)
+INSERT INTO role 
+    (title, salary, department_id)
 VALUES 
-    ("CEO", 270000, 1),
-    ("CTO", 250000, 1),
+    ('CEO', 270000, 1),
+    ('CTO', 250000, 1),
     ("CFO", 220000, 1),
     ("CSO", 160000, 1),
     ("CMO", 140000, 1),
@@ -32,9 +34,10 @@ VALUES
     ("QA Tester", 65000, 5),
     ("Accountant", 130000, 6),
     ("Talent Acquisition Specialist", 110000, 6),
-    ("Office Administrator", 70000, 6)
+    ("Office Administrator", 70000, 6);
 
-INSERT INTO employee (first_name, last_name, role_id, manager_id)
+INSERT INTO employee 
+    (first_name, last_name, role_id, manager_id)
 VALUES
     ("Ron", "Swanson", 1, NULL),
     ("Leslie", "Knope", 5, 1),
@@ -45,4 +48,4 @@ VALUES
     ("Andy", "Dwyer", 12, 5),
     ("Terry", "Gergich", 19, 2),
     ("Ann", "Perkins", 21, 1),
-    ("Jean-Ralphio", "Saperstein", 10, 5)
+    ("Jean-Ralphio", "Saperstein", 10, 5);
