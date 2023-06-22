@@ -9,7 +9,7 @@ const db = mysql.createConnection(
     password: '$h1ft3dD',
     database: 'hr_db'
     },
-    console.log(`Connect to the employee database`)
+    console.log(`Connected to the employee database`)
 );
 
 db.connect((err) => {
@@ -216,3 +216,77 @@ const addEmployee = () => {
     );
   });
 };
+
+const editEmployeeRole = () => {
+    
+      db.query(
+        `SELECT id, first_name, last_name FROM employee`,
+        (err, employees) => {
+          if (err) throw err;
+  
+          const allEmployees = 
+            employees.map((employee) => ({
+              name: employee.first_name + " " + employee.last_name,
+              value: employee.id,
+            }));
+        
+    db.query(`SELECT id, title FROM role`, (err, roles) => {
+        if (err) throw err;
+    
+        const roleOptions = roles.map((role) => ({
+            name: role.title,
+            value: role.id,
+        }));
+
+        
+  
+          inquirer
+            .prompt([
+              {
+                type: "list",
+                message: "Who'd role would you like to update?",
+                choices: allEmployees,
+                name: "employeeId",
+              },
+              {
+                type: "list",
+                message: "What is the employee\'s new job title?",
+                choices: roleOptions,
+                name: "roleId",
+              },
+              {
+                type: 'confirm',
+                message: 'Do they have a new manager?',
+                name: 'checkManager',
+                default: true
+                },
+                {
+                    type: "list",
+                    message: "Who is the employee's manager?",
+                    choices: allEmployees,
+                    name: "managerId",
+                    when(answers) {
+                        return answers.checkManager === true
+                    },
+                  }, 
+
+            ])
+            .then((answer) => {
+              db.query(
+                `UPDATE employee SET role_id = ?, manager_id = ? WHERE id = ?`,
+                [
+                  answer.roleId,
+                  answer.managerId,
+                  answer.employeeId,
+                ],
+                (err, res) => {
+                  if (err) throw err;
+                  console.log("Employee updated!");
+                  startMenu();
+                }
+              );
+            });
+        }
+      );
+    });
+  };
