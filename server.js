@@ -79,9 +79,140 @@ const viewRoles = () => {
 };
 
 const viewEmployees = () => {
-    db.query(`SELECT * FROm employee`, (err, res) => {
+    db.query(`SELECT * FROM employee`, (err, res) => {
         if (err) throw err;
         console.table(res);
         startMenu();
     })
-}
+};
+
+const addDepartment = () => {
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "What is the name of the department you are adding?",
+            name: "department"
+        },
+    ])
+    .then(answer => {
+        db.query(`INSERT INTO department (name) VALUES (?)`, [answer.department], (err, res) => {
+            if (err) throw err;
+            console.log("Department added!");
+            startMenu();
+        });
+    });
+};
+
+const addRole = () => {
+    
+    db.query(`SELECT id, name FROM department`, (err, departments) => {
+        if (err) throw err;
+
+        const departmentOptions = departments.map((department) => ({
+            name: department.name,
+            value: department.id,
+        }));
+
+        inquirer.prompt([
+            {
+                type: "input",
+                message: "What is the name of the role you are adding?",
+                name: "roleTitle"
+            },
+            {
+                type: "input",
+                message: "Please enter the base salary for this role using only numbers:",
+                name: "salary",
+                validate: (input) => {
+                    const validateInput = input.replace(/[^0-9.]/g, '');
+                    const numbers = /^\d+(\.\d+)?$/.test(validateInput);
+                    if (numbers) {
+                        return true;
+                    }
+                    return `Please enter a salary using only numbers.`;
+                },
+            },
+            {
+                type: "list",
+                message: "What is the department this role goes under?",
+                choices: departmentOptions,
+                name: "departmentId"
+            }
+        ])
+        .then(answer => {
+            db.query(`INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`, [answer.roleTitle, answer.salary, answer.departmentId], (err, res) => {
+                if (err) throw err;
+                console.log("Job added!");
+                startMenu();
+            });
+        });      
+    })
+};
+
+const addEmployee = () => {
+  db.query(`SELECT id, title FROM role`, (err, roles) => {
+    if (err) throw err;
+
+    const roleOptions = roles.map((role) => ({
+      name: role.title,
+      value: role.id,
+    }));
+
+    db.query(
+      `SELECT id, first_name, last_name FROM employee`,
+      (err, managers) => {
+        if (err) throw err;
+
+        const managerOptions = [
+          { name: "None", value: null },
+          ...managers.map((employee) => ({
+            name: employee.first_name + " " + employee.last_name,
+            value: employee.id,
+          })),
+        ];
+
+        inquirer
+          .prompt([
+            {
+              type: "input",
+              message: "What is the employee's first name?",
+              name: "firstName",
+            },
+            {
+              type: "input",
+              message: "What is the employee's last name?",
+              name: "lastName",
+            },
+            {
+              type: "list",
+              message: "What is the employee's job title?",
+              choices: roleOptions,
+              name: "roleId",
+            },
+            {
+              type: "list",
+              message: "Who is the employee's manager?",
+              choices: managerOptions,
+              name: "managerId",
+            },
+          ])
+          .then((answer) => {
+            db.query(
+              `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`,
+              [
+                answer.firstName,
+                answer.lastName,
+                answer.roleId,
+                answer.managerId,
+              ],
+              (err, res) => {
+                if (err) throw err;
+                console.log("Employee added!");
+                startMenu();
+              }
+            );
+          });
+      }
+    );
+  });
+};
