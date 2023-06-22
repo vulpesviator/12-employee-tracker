@@ -97,14 +97,14 @@ const viewEmployees = () => {
                 });
                 break;
             case "By Manager":
-                db.query(`SELECT * FROM employee`, (err, res) => {
+                db.query(`SELECT * FROM employee ORDER BY manager_id`, (err, res) => {
                     if (err) throw err;
                     console.table(res);
                     startMenu();
                 });
                 break;
             case "By Department":
-                db.query(`SELECT * FROM employee`, (err, res) => {
+                db.query(`SELECT * FROM employee JOIN role ON employee.role_id = role. id JOIN department ON role.department_id = department.id ORDER BY department.id`, (err, res) => {
                     if (err) throw err;
                     console.table(res);
                     startMenu();
