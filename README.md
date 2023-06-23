@@ -10,7 +10,6 @@ This project uses the inquirer node package to create an employee database from 
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [License](#license)
-- [Badges](#badges)
 - [Questions](#questions)
 
 ## Installation
@@ -19,9 +18,9 @@ To run this application locally, clone or download the repo which contains the n
 
 ## Usage
 
+![12-employee-tracker](https://github.com/vulpesviator/12-employee-tracker/assets/123843930/b79554e1-6f54-4e41-bfdd-46e0ea5acc8c)
 
-
-[MySQL Employee Tracker Video Walkthrough](https://drive.google.com/file/d/1Qo3rVK7F8qB3g8SUJFJJicVp-c-qH3cP/view?usp=sharing)
+[View the full MySQL Employee Tracker Video Walkthrough here](https://drive.google.com/file/d/1Qo3rVK7F8qB3g8SUJFJJicVp-c-qH3cP/view?usp=sharing)
 
 1. Execute the schema.sql to set up your database locally (There is a sample `seeds.sql` you can use to test the system).
 2. Update the `server.js` file with your local MySQL credentials.
