@@ -439,5 +439,45 @@ const editEmployeeRole = () => {
     };
 
   const removeEmployee = () => {
+    db.query(
+      `SELECT id, first_name, last_name FROM employee`,
+      (err, employees) => {
+        if (err) throw err;
 
+        const allEmployees = 
+          employees.map((employee) => ({
+            name: employee.first_name + " " + employee.last_name,
+            value: employee.id,
+          }));
+
+      inquirer.prompt([
+        {
+          type: "list",
+          message: chalk.bgRed("Which employee would you like to remove?"),
+          choices: allEmployees,
+          name: "employeeId",
+        },
+        {
+          type: 'confirm',
+          message: chalk.bgRed("Are you sure you want to delete this employee from the database?"),
+          name: "confirmRemove",
+          default: false,
+        }
+      ])
+      .then((answer) => {
+        if (answer.confirmRemove) {
+        db.query(
+          `DELETE FROM employee WHERE id = ?`,[answer.employeeId],
+          (err, res) => {
+            if (err) throw err;
+            console.log(chalk.red("Employee removed!"));
+            startMenu();
+          }
+        );
+        } else {
+          console.log(chalk.yellow("Removal cancelled."));
+          startMenu();
+        }
+      });
+  })
   }
