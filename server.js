@@ -301,13 +301,13 @@ const editEmployeeRole = () => {
         }));
 
         db.query(
-          `SELECT id, first_name, last_name FROM employee`,
-          (err, managers) => {
+          `SELECT id, first_name, last_name, role_id FROM employee`,
+          (err, employeesWithRoles) => {
             if (err) throw err;
 
             const managerOptions = [
               { name: "None", value: null },
-              ...managers.map((employee) => ({
+              ...employeesWithRoles.map((employee) => ({
                 name: employee.first_name + " " + employee.last_name,
                 value: employee.id,
               })),
@@ -353,9 +353,19 @@ const editEmployeeRole = () => {
                 },
               ])
               .then((answer) => {
+                const selectedEmployee = employeesWithRoles.find(
+                  (employee) => employee.id === answer.employeeId
+                );
+
+                const existingRoleId = selectedEmployee.role_id;
+
                 db.query(
                   `UPDATE employee SET role_id = ?, manager_id = ? WHERE id = ?`,
-                  [answer.roleId, answer.managerId, answer.employeeId],
+                  [
+                    answer.roleId || existingRoleId,
+                    answer.managerId,
+                    answer.employeeId,
+                  ],
                   (err, res) => {
                     if (err) throw err;
                     console.log("Employee updated!");
