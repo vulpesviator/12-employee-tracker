@@ -356,7 +356,44 @@ const editEmployeeRole = () => {
   };
 
   const removeDepartment = () => {
+    db.query(`SELECT id, name FROM department`, (err, departments) => {
+      if (err) throw err;
 
+      const departmentOptions = departments.map((department) => ({
+          name: department.name,
+          value: department.id,
+      }));
+
+      inquirer.prompt([
+        {
+          type: "list",
+          message: chalk.bgRed("Which department would you like to remove?"),
+          choices: departmentOptions,
+          name: "departmentId",
+        },
+        {
+          type: 'confirm',
+          message: chalk.bgRed("Are you sure you want to delete this entire department?"),
+          name: "confirmRemove",
+          default: false,
+        }
+      ])
+      .then((answer) => {
+        if (answer.confirmRemove) {
+        db.query(
+          `DELETE FROM department WHERE id = ?`,[answer.departmentId],
+          (err, res) => {
+            if (err) throw err;
+            console.log(chalk.red("Department removed!"));
+            startMenu();
+          }
+        );
+        } else {
+          console.log(chalk.yellow("Removal cancelled."));
+          startMenu();
+        }
+      });
+  })
   };
 
   const removeRole = () => {
