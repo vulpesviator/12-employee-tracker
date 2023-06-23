@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/vulpesviator/12-employee-tracker#readme",
   "dependencies": {
+    "chalk": "^4.0.0",
     "inquirer": "^8.2.4",
     "mysql2": "^3.4.0"
   }

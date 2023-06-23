@@ -1,5 +1,6 @@
 const mysql = require("mysql2");
 const inquirer = require("inquirer");
+const chalk = require("chalk");
 
 
 const db = mysql.createConnection(
@@ -371,13 +372,13 @@ const editEmployeeRole = () => {
             .prompt([
               {
                 type: "list",
-                message: "Which job title would you like to remove?",
+                message: chalk.bgRed("Which job title would you like to remove?"),
                 choices: roleOptions,
                 name: "roleId",
               },
               {
                 type: 'confirm',
-                message: "Are you sure you want to delete this job?",
+                message: chalk.bgRed("Are you sure you want to delete this job?"),
                 name: "confirmRemove",
                 default: false,
               }
@@ -388,12 +389,12 @@ const editEmployeeRole = () => {
                 `DELETE FROM role WHERE id = ?`,[answer.roleId],
                 (err, res) => {
                   if (err) throw err;
-                  console.log("Role removed!");
+                  console.log(chalk.red("Role removed!"));
                   startMenu();
                 }
               );
               } else {
-                console.log("Removal cancelled.");
+                console.log(chalk.yellow("Removal cancelled."));
                 startMenu();
               }
             });
