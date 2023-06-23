@@ -30,7 +30,10 @@ startMenu = () => {
                 "Add a Department",
                 "Add a Role",
                 "Add an Employee",
-                "Update an Employee's Manager or Role"
+                "Update an Employee's Manager or Role",
+                "Remove a Department",
+                "Remove a Role",
+                "Remove an Employee"
             ],
             name: "menu"
         },
@@ -58,6 +61,15 @@ startMenu = () => {
             case "Update an Employee's Manager or Role":
                 editEmployeeRole();
                 break;
+            case "Remove a Department":
+              removeDepartment();
+              break;
+            case "Remove a Role":
+              removeRole();
+              break;
+            case "Remove an Employee":
+              removeEmployee();
+              break;
         }
     });
 };
@@ -341,3 +353,53 @@ const editEmployeeRole = () => {
     });
     });
   };
+
+  const removeDepartment = () => {
+
+  };
+
+  const removeRole = () => {
+    db.query(`SELECT id, title FROM role`, (err, roles) => {
+      if (err) throw err;
+  
+      const roleOptions = roles.map((role) => ({
+          name: role.title,
+          value: role.id,
+      }));
+
+      inquirer
+            .prompt([
+              {
+                type: "list",
+                message: "Which job title would you like to remove?",
+                choices: roleOptions,
+                name: "roleId",
+              },
+              {
+                type: 'confirm',
+                message: "Are you sure you want to delete this job?",
+                name: "confirmRemove",
+                default: false,
+              }
+            ])
+            .then((answer) => {
+              if (answer.confirmRemove) {
+              db.query(
+                `DELETE FROM role WHERE id = ?`,[answer.roleId],
+                (err, res) => {
+                  if (err) throw err;
+                  console.log("Role removed!");
+                  startMenu();
+                }
+              );
+              } else {
+                console.log("Removal cancelled.");
+                startMenu();
+              }
+            });
+    })
+    };
+
+  const removeEmployee = () => {
+
+  }
