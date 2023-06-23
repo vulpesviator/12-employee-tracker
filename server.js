@@ -1,5 +1,6 @@
 const mysql = require("mysql2");
 const inquirer = require("inquirer");
+const chalk = require("chalk");
 
 
 const db = mysql.createConnection(
@@ -30,7 +31,10 @@ startMenu = () => {
                 "Add a Department",
                 "Add a Role",
                 "Add an Employee",
-                "Update an Employee's Manager or Role"
+                "Update an Employee's Manager or Role",
+                "Remove a Department",
+                "Remove a Role",
+                "Remove an Employee"
             ],
             name: "menu"
         },
@@ -58,6 +62,15 @@ startMenu = () => {
             case "Update an Employee's Manager or Role":
                 editEmployeeRole();
                 break;
+            case "Remove a Department":
+              removeDepartment();
+              break;
+            case "Remove a Role":
+              removeRole();
+              break;
+            case "Remove an Employee":
+              removeEmployee();
+              break;
         }
     });
 };
@@ -341,3 +354,130 @@ const editEmployeeRole = () => {
     });
     });
   };
+
+  const removeDepartment = () => {
+    db.query(`SELECT id, name FROM department`, (err, departments) => {
+      if (err) throw err;
+
+      const departmentOptions = departments.map((department) => ({
+          name: department.name,
+          value: department.id,
+      }));
+
+      inquirer.prompt([
+        {
+          type: "list",
+          message: chalk.bgRed("Which department would you like to remove?"),
+          choices: departmentOptions,
+          name: "departmentId",
+        },
+        {
+          type: 'confirm',
+          message: chalk.bgRed("Are you sure you want to delete this entire department?"),
+          name: "confirmRemove",
+          default: false,
+        }
+      ])
+      .then((answer) => {
+        if (answer.confirmRemove) {
+        db.query(
+          `DELETE FROM department WHERE id = ?`,[answer.departmentId],
+          (err, res) => {
+            if (err) throw err;
+            console.log(chalk.red("Department removed!"));
+            startMenu();
+          }
+        );
+        } else {
+          console.log(chalk.yellow("Removal cancelled."));
+          startMenu();
+        }
+      });
+  })
+  };
+
+  const removeRole = () => {
+    db.query(`SELECT id, title FROM role`, (err, roles) => {
+      if (err) throw err;
+  
+      const roleOptions = roles.map((role) => ({
+          name: role.title,
+          value: role.id,
+      }));
+
+      inquirer
+            .prompt([
+              {
+                type: "list",
+                message: chalk.bgRed("Which job title would you like to remove?"),
+                choices: roleOptions,
+                name: "roleId",
+              },
+              {
+                type: 'confirm',
+                message: chalk.bgRed("Are you sure you want to delete this job?"),
+                name: "confirmRemove",
+                default: false,
+              }
+            ])
+            .then((answer) => {
+              if (answer.confirmRemove) {
+              db.query(
+                `DELETE FROM role WHERE id = ?`,[answer.roleId],
+                (err, res) => {
+                  if (err) throw err;
+                  console.log(chalk.red("Role removed!"));
+                  startMenu();
+                }
+              );
+              } else {
+                console.log(chalk.yellow("Removal cancelled."));
+                startMenu();
+              }
+            });
+    })
+    };
+
+  const removeEmployee = () => {
+    db.query(
+      `SELECT id, first_name, last_name FROM employee`,
+      (err, employees) => {
+        if (err) throw err;
+
+        const allEmployees = 
+          employees.map((employee) => ({
+            name: employee.first_name + " " + employee.last_name,
+            value: employee.id,
+          }));
+
+      inquirer.prompt([
+        {
+          type: "list",
+          message: chalk.bgRed("Which employee would you like to remove?"),
+          choices: allEmployees,
+          name: "employeeId",
+        },
+        {
+          type: 'confirm',
+          message: chalk.bgRed("Are you sure you want to delete this employee from the database?"),
+          name: "confirmRemove",
+          default: false,
+        }
+      ])
+      .then((answer) => {
+        if (answer.confirmRemove) {
+        db.query(
+          `DELETE FROM employee WHERE id = ?`,[answer.employeeId],
+          (err, res) => {
+            if (err) throw err;
+            console.log(chalk.red("Employee removed!"));
+            startMenu();
+          }
+        );
+        } else {
+          console.log(chalk.yellow("Removal cancelled."));
+          startMenu();
+        }
+      });
+  })
+  }
